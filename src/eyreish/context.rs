@@ -1,8 +1,15 @@
+extern crate alloc;
+
 use super::error::{ContextError, ErrorImpl};
 use super::{Report, WrapErr};
 use core::fmt::{self, Debug, Display, Write};
+use core::convert::Infallible;
 
+#[cfg(feature = "std")]
 use std::error::Error as StdError;
+#[cfg(not(feature = "std"))]
+use crate::StdError as StdError;
+use alloc::boxed::Box;
 
 use crate::{Diagnostic, LabeledSpan};
 
@@ -38,7 +45,7 @@ mod ext {
     }
 }
 
-impl<T> WrapErr<T, std::convert::Infallible> for Option<T> {
+impl<T> WrapErr<T, Infallible> for Option<T> {
     fn wrap_err<D>(self, msg: D) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,

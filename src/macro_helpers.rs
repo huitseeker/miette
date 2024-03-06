@@ -51,6 +51,7 @@ impl ToLabeledSpan<LabeledSpan> for ToLabelSpanWrapper {
         span
     }
 }
+#[cfg(not(feature = "std"))]
 impl<T> ToLabeledSpan<T> for ToLabelSpanWrapper
 where
     T: Into<SourceSpan>,

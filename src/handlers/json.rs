@@ -1,4 +1,7 @@
-use std::fmt::{self, Write};
+extern crate alloc;
+
+use core::fmt::{self, Write};
+use alloc::string::ToString;
 
 use crate::{
     diagnostic_chain::DiagnosticChain, protocol::Diagnostic, ReportHandler, Severity, SourceCode,

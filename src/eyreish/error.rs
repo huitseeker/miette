@@ -1,8 +1,14 @@
+extern crate alloc;
+
 use core::any::TypeId;
 use core::fmt::{self, Debug, Display};
 use core::mem::ManuallyDrop;
 use core::ptr::{self, NonNull};
+#[cfg(feature = "std")]
 use std::error::Error as StdError;
+#[cfg(not(feature = "std"))]
+use crate::StdError as StdError;
+use alloc::boxed::Box;
 
 use super::ptr::{Mut, Own, Ref};
 use super::Report;
@@ -429,7 +435,7 @@ impl Report {
     /// Construct a [`Report`] directly from an error-like type
     pub fn from_err<E>(err: E) -> Self
     where
-        E: std::error::Error + Send + Sync + 'static,
+        E: StdError + Send + Sync + 'static,
     {
         super::DiagnosticError(Box::new(err)).into()
     }
@@ -816,7 +822,15 @@ impl AsRef<dyn StdError> for Report {
     }
 }
 
+#[cfg(feature = "std")]
 impl std::borrow::Borrow<dyn Diagnostic> for Report {
+    fn borrow(&self) -> &(dyn Diagnostic + 'static) {
+        self.as_ref()
+    }
+}
+
+#[cfg(not(feature = "std"))]
+impl core::borrow::Borrow<dyn Diagnostic> for Report {
     fn borrow(&self) -> &(dyn Diagnostic + 'static) {
         self.as_ref()
     }

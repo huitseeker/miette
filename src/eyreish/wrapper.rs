@@ -1,6 +1,14 @@
+extern crate alloc;
+
 use core::fmt::{self, Debug, Display};
 
+#[cfg(feature = "std")]
 use std::error::Error as StdError;
+#[cfg(not(feature = "std"))]
+use crate::StdError as StdError;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 use crate::{Diagnostic, LabeledSpan, Report, SourceCode};
 
@@ -106,16 +114,6 @@ impl Display for BoxedError {
 impl StdError for BoxedError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         self.0.source()
-    }
-
-    fn description(&self) -> &str {
-        #[allow(deprecated)]
-        self.0.description()
-    }
-
-    fn cause(&self) -> Option<&dyn StdError> {
-        #[allow(deprecated)]
-        self.0.cause()
     }
 }
 

@@ -1,3 +1,5 @@
+#![no_std]
+
 #![deny(missing_docs, missing_debug_implementations, nonstandard_style)]
 #![warn(unreachable_pub, rust_2018_idioms)]
 #![allow(unexpected_cfgs)]
@@ -815,6 +817,23 @@
 //! and some from [`thiserror`](https://github.com/dtolnay/thiserror), also
 //! under the Apache License. Some code is taken from
 //! [`ariadne`](https://github.com/zesterer/ariadne), which is MIT licensed.
+#[cfg(feature = "std")]
+extern crate std;
+
+#[cfg(feature = "std")]
+pub use std::error::Error as StdError;
+
+#[cfg(not(feature = "std"))]
+/// Compatibility trait for error handling in no_std environments.
+/// This trait provides a subset of `std::error::Error` functionality
+/// suitable for no_std environments.
+pub trait StdError: core::fmt::Debug + core::fmt::Display {
+    /// Returns the lower-level source of this error, if any.
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        None
+    }
+}
+
 #[cfg(feature = "derive")]
 pub use miette_derive::*;
 

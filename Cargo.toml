@@ -13,9 +13,11 @@ rust-version = "1.82.0"
 exclude = ["images/", "tests/", "miette-derive/"]
 
 [dependencies]
+thiserror = "2.0.11"
 miette-derive = { path = "miette-derive", version = "=7.6.0", optional = true }
-unicode-width = "0.2.0"
+unicode-width = { version = "0.2.0", default-features = false }
 cfg-if = "1.0.0"
+spin = { version = "0.9", default-features = false, features = ["mutex", "spin_mutex", "lazy"] }
 
 owo-colors = { version = "4.0.0", optional = true }
 textwrap = { version = "0.16.0", default-features = false, features = ["unicode-linebreak", "unicode-width"], optional = true }
@@ -29,8 +31,10 @@ serde = { version = "1.0.196", features = ["derive"], optional = true }
 syntect = { version = "5.1.0", optional = true }
 
 [dev-dependencies]
-thiserror = "2.0.11"
 semver = "1.0.21"
+
+[build-dependencies]
+rustc_version = "0.2"
 
 # Eyre devdeps
 futures = { version = "0.3", default-features = false }
@@ -45,7 +49,8 @@ serde_json = "1.0.113"
 strip-ansi-escapes = "0.2.0"
 
 [features]
-default = ["derive"]
+default = ["derive", "std"]
+std = ["thiserror/std", "fancy-no-syscall"]
 derive = ["dep:miette-derive"]
 no-format-args-capture = []
 fancy-base = [

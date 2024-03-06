@@ -8,7 +8,7 @@ use crate::ReportHandler;
 use crate::ThemeCharacters;
 use crate::ThemeStyles;
 use cfg_if::cfg_if;
-use std::fmt;
+use core::fmt;
 
 /// Settings to control the color format used for graphical rendering.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Default)]

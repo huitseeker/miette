@@ -1,14 +1,21 @@
-use std::{error::Error, fmt::Display};
+extern crate alloc;
+
+#[cfg(feature = "std")]
+use std::error::Error;
+#[cfg(not(feature = "std"))]
+use crate::StdError as Error;
+use core::fmt::Display;
+use alloc::boxed::Box;
 
 use crate::{Diagnostic, Report};
 
 /// Convenience [`Diagnostic`] that can be used as an "anonymous" wrapper for
 /// Errors. This is intended to be paired with [`IntoDiagnostic`].
 #[derive(Debug)]
-pub(crate) struct DiagnosticError(pub(crate) Box<dyn std::error::Error + Send + Sync + 'static>);
+pub(crate) struct DiagnosticError(pub(crate) Box<dyn Error + Send + Sync + 'static>);
 
-impl Display for DiagnosticError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for DiagnosticError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let msg = &self.0;
         write!(f, "{msg}")
     }
@@ -38,7 +45,15 @@ pub trait IntoDiagnostic<T, E> {
     fn into_diagnostic(self) -> Result<T, Report>;
 }
 
+#[cfg(feature = "std")]
 impl<T, E: std::error::Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> {
+    fn into_diagnostic(self) -> Result<T, Report> {
+        self.map_err(|e| DiagnosticError(Box::new(e)).into())
+    }
+}
+
+#[cfg(not(feature = "std"))]
+impl<T, E: Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> {
     fn into_diagnostic(self) -> Result<T, Report> {
         self.map_err(|e| DiagnosticError(Box::new(e)).into())
     }
@@ -46,12 +61,15 @@ impl<T, E: std::error::Error + Send + Sync + 'static> IntoDiagnostic<T, E> for R
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "std")]
     use std::io::{self, ErrorKind};
 
     use super::*;
 
+    #[cfg(feature = "std")]
     use crate::error::tests::TestError;
 
+    #[cfg(feature = "std")]
     #[test]
     fn diagnostic_error() {
         let inner_error = io::Error::new(ErrorKind::Other, "halt and catch fire");

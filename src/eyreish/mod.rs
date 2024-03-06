@@ -4,10 +4,16 @@
     clippy::new_ret_no_self,
     clippy::wrong_self_convention
 )]
-use core::fmt::Display;
+extern crate alloc;
 
+use core::fmt::Display;
+use alloc::boxed::Box;
+
+#[cfg(feature = "std")]
 use std::error::Error as StdError;
-use std::sync::OnceLock;
+#[cfg(not(feature = "std"))]
+use crate::StdError as StdError;
+use spin::Once;
 
 #[allow(unreachable_pub)]
 pub use into_diagnostic::*;
@@ -61,7 +67,11 @@ unsafe impl Send for Report {}
 pub type ErrorHook =
     Box<dyn Fn(&(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> + Sync + Send + 'static>;
 
-static HOOK: OnceLock<ErrorHook> = OnceLock::new();
+static HOOK: Once<ErrorHook> = Once::new();
+
+fn default_hook() -> ErrorHook {
+    Box::new(get_default_printer)
+}
 
 /// Error indicating that [`set_hook()`] was unable to install the provided
 /// [`ErrorHook`].
@@ -81,18 +91,23 @@ impl Diagnostic for InstallError {}
 Set the error hook.
 */
 pub fn set_hook(hook: ErrorHook) -> Result<(), InstallError> {
-    HOOK.set(hook).map_err(|_| InstallError)
+    HOOK.call_once(|| hook);
+    Ok(())
 }
 
 #[cfg_attr(track_caller, track_caller)]
 #[cfg_attr(not(track_caller), allow(unused_mut))]
 fn capture_handler(error: &(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> {
-    let hook = HOOK.get_or_init(|| Box::new(get_default_printer)).as_ref();
+    static DEFAULT: Once<ErrorHook> = Once::new();
+    let hook = HOOK.get().unwrap_or_else(|| {
+        DEFAULT.call_once(|| default_hook());
+        DEFAULT.get().unwrap()
+    });
 
     #[cfg(track_caller)]
     {
         let mut handler = hook(error);
-        handler.track_caller(std::panic::Location::caller());
+        handler.track_caller(core::panic::Location::caller());
         handler
     }
     #[cfg(not(track_caller))]
@@ -193,7 +208,7 @@ pub trait ReportHandler: core::any::Any + Send + Sync {
 
     /// Store the location of the caller who constructed this error report
     #[allow(unused_variables)]
-    fn track_caller(&mut self, location: &'static std::panic::Location<'static>) {}
+    fn track_caller(&mut self, location: &'static core::panic::Location<'static>) {}
 }
 
 /// type alias for `Result<T, Report>`
