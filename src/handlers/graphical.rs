@@ -1,4 +1,10 @@
-use std::fmt::{self, Write};
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::fmt::{self, Write};
 
 use owo_colors::{OwoColorize, Style, StyledList};
 use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};

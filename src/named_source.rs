@@ -12,9 +12,9 @@ pub struct NamedSource<S: SourceCode + 'static> {
 
 extern crate alloc;
 
+use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::boxed::Box;
 
 impl<S: SourceCode> core::fmt::Debug for NamedSource<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

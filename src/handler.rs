@@ -1,3 +1,7 @@
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+
 use crate::highlighters::Highlighter;
 use crate::highlighters::MietteHighlighter;
 use crate::protocol::Diagnostic;
@@ -491,7 +495,10 @@ mod syscall {
     #[inline]
     pub(super) fn supports_color() -> bool {
         cfg_if! {
-            if #[cfg(feature = "fancy-no-syscall")] {
+            if #[cfg(feature = "fancy-no-backtrace")] {
+                supports_color::on(supports_color::Stream::Stderr).is_some()
+            } else if #[cfg(feature = "fancy-no-syscall")] {
+                // In no-std environment without color support, default to no color support
                 false
             } else {
                 supports_color::on(supports_color::Stream::Stderr).is_some()
@@ -502,8 +509,11 @@ mod syscall {
     #[inline]
     pub(super) fn supports_color_has_16m() -> Option<bool> {
         cfg_if! {
-            if #[cfg(feature = "fancy-no-syscall")] {
-                None
+            if #[cfg(feature = "fancy-no-backtrace")] {
+                supports_color::on(supports_color::Stream::Stderr).map(|color| color.has_16m)
+            } else if #[cfg(feature = "fancy-no-syscall")] {
+                // In no-std environment without color support, default to no RGB color support
+                Some(false)
             } else {
                 supports_color::on(supports_color::Stream::Stderr).map(|color| color.has_16m)
             }

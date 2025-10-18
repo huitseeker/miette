@@ -1,8 +1,8 @@
 extern crate alloc;
 
+use alloc::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr::NonNull;
-use alloc::boxed::Box;
 
 #[repr(transparent)]
 /// A raw pointer that owns its pointee

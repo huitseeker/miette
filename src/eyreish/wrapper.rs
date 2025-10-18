@@ -2,13 +2,8 @@ extern crate alloc;
 
 use core::fmt::{self, Debug, Display};
 
-#[cfg(feature = "std")]
-use std::error::Error as StdError;
-#[cfg(not(feature = "std"))]
-use crate::StdError as StdError;
+use crate::StdError;
 use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
 
 use crate::{Diagnostic, LabeledSpan, Report, SourceCode};
 
@@ -216,6 +211,11 @@ impl<C> StdError for WithSourceCode<Report, C> {
 
 #[cfg(test)]
 mod tests {
+    
+    use std::{
+        boxed::Box,
+        string::{String, ToString},
+    };
     use thiserror::Error;
 
     use crate::{Diagnostic, LabeledSpan, Report, SourceCode, SourceSpan};

@@ -1,14 +1,11 @@
 extern crate alloc;
 
+use crate::StdError;
+use alloc::boxed::Box;
 use core::any::TypeId;
 use core::fmt::{self, Debug, Display};
 use core::mem::ManuallyDrop;
 use core::ptr::{self, NonNull};
-#[cfg(feature = "std")]
-use std::error::Error as StdError;
-#[cfg(not(feature = "std"))]
-use crate::StdError as StdError;
-use alloc::boxed::Box;
 
 use super::ptr::{Mut, Own, Ref};
 use super::Report;
@@ -93,7 +90,6 @@ impl Report {
         Report::from_boxed(error)
     }
 
-    #[cfg_attr(track_caller, track_caller)]
     #[cold]
     pub(crate) fn from_std<E>(error: E) -> Self
     where
@@ -160,7 +156,7 @@ impl Report {
         };
 
         // Safety: passing vtable that operates on the right type.
-        let handler = Some(super::capture_handler(&error));
+        let handler = Some(super::capture_handler_with_location(&error));
 
         unsafe { Report::construct(error, vtable, handler) }
     }
@@ -445,7 +441,6 @@ impl<E> From<E> for Report
 where
     E: Diagnostic + Send + Sync + 'static,
 {
-    #[cfg_attr(track_caller, track_caller)]
     #[cold]
     fn from(error: E) -> Self {
         Report::from_std(error)

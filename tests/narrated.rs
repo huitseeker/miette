@@ -1,5 +1,7 @@
 #![cfg(feature = "fancy-no-backtrace")]
 
+extern crate alloc;
+
 use miette::{Diagnostic, MietteError, NamedSource, NarratableReportHandler, Report, SourceSpan};
 
 use miette::{GraphicalReportHandler, GraphicalTheme};

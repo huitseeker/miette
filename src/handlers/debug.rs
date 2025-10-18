@@ -1,7 +1,7 @@
 extern crate alloc;
 
-use core::fmt;
 use alloc::vec::Vec;
+use core::fmt;
 
 use crate::{protocol::Diagnostic, ReportHandler};
 

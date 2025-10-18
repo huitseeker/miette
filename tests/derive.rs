@@ -1,3 +1,5 @@
+extern crate alloc;
+
 use miette::{Diagnostic, Report, Severity, SourceSpan};
 use thiserror::Error;
 

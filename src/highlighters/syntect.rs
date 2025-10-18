@@ -1,5 +1,10 @@
 use std::path::Path;
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec;
+use alloc::vec::Vec;
+
 // all syntect imports are explicitly qualified, but their paths are shortened for convenience
 #[allow(clippy::module_inception)]
 mod syntect {

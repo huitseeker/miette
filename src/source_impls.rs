@@ -3,14 +3,14 @@ Default trait implementations for [`SourceCode`].
 */
 extern crate alloc;
 
-use core::fmt::Debug;
 use alloc::borrow::Cow;
 use alloc::borrow::ToOwned;
-use alloc::collections::VecDeque;
-use alloc::sync::Arc;
-use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::collections::VecDeque;
+use alloc::string::String;
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+use core::fmt::Debug;
 
 use crate::{MietteError, MietteSpanContents, SourceCode, SourceSpan, SpanContents};
 

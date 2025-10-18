@@ -1,5 +1,7 @@
 #![cfg(feature = "fancy-no-backtrace")]
 
+extern crate alloc;
+
 use miette::{Diagnostic, MietteHandler, MietteHandlerOpts, ReportHandler, RgbColors};
 use regex::Regex;
 use std::ffi::OsString;
@@ -83,7 +85,9 @@ fn check_colors<F: Fn(MietteHandlerOpts) -> MietteHandlerOpts>(
     //
     // Since environment variables are shared for the entire process, we need
     // to ensure that only one test that modifies these env vars runs at a time.
-    let lock = COLOR_ENV_VARS.lock().unwrap();
+    let lock = COLOR_ENV_VARS
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
 
     let guards = (
         EnvVarGuard::new("NO_COLOR"),

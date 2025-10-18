@@ -1,5 +1,7 @@
-use std::io::IsTerminal;
-
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 use owo_colors::Style;
 
 /**

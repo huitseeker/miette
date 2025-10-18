@@ -1,4 +1,6 @@
 mod json_report_handler {
+    extern crate alloc;
+
     use miette::{Diagnostic, MietteError, NamedSource, Report, SourceSpan};
 
     use miette::JSONReportHandler;

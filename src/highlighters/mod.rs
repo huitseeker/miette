@@ -13,6 +13,11 @@
 
 use std::{ops::Deref, sync::Arc};
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+
 use crate::SpanContents;
 use owo_colors::Styled;
 

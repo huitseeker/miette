@@ -5,9 +5,6 @@ NOTE: This module is taken wholesale from <https://crates.io/crates/eyre>.
 */
 extern crate alloc;
 
-#[cfg(feature = "std")]
-use std::error::Error as StdError;
-#[cfg(not(feature = "std"))]
 use crate::StdError;
 use alloc::vec::{self, Vec};
 

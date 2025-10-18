@@ -6,14 +6,14 @@
 )]
 extern crate alloc;
 
-use core::fmt::Display;
 use alloc::boxed::Box;
+use core::fmt::Display;
 
+#[cfg(not(feature = "std"))]
+use crate::StdError;
+use spin::Once;
 #[cfg(feature = "std")]
 use std::error::Error as StdError;
-#[cfg(not(feature = "std"))]
-use crate::StdError as StdError;
-use spin::Once;
 
 #[allow(unreachable_pub)]
 pub use into_diagnostic::*;
@@ -95,9 +95,20 @@ pub fn set_hook(hook: ErrorHook) -> Result<(), InstallError> {
     Ok(())
 }
 
+pub(crate) fn capture_handler(error: &(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> {
+    static DEFAULT: Once<ErrorHook> = Once::new();
+    let hook = HOOK.get().unwrap_or_else(|| {
+        DEFAULT.call_once(|| default_hook());
+        DEFAULT.get().unwrap()
+    });
+
+    hook(error)
+}
+
 #[cfg_attr(track_caller, track_caller)]
-#[cfg_attr(not(track_caller), allow(unused_mut))]
-fn capture_handler(error: &(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> {
+pub(crate) fn capture_handler_with_location(
+    error: &(dyn Diagnostic + 'static),
+) -> Box<dyn ReportHandler> {
     static DEFAULT: Once<ErrorHook> = Once::new();
     let hook = HOOK.get().unwrap_or_else(|| {
         DEFAULT.call_once(|| default_hook());

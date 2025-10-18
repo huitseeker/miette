@@ -5,13 +5,13 @@ full reporting and such features.
 */
 extern crate alloc;
 
-use core::fmt::{self, Display};
-#[cfg(feature = "std")]
-use std::fs;
-use core::panic::Location;
-use core::ops;
 use alloc::boxed::Box;
 use alloc::string::String;
+use core::fmt::{self, Display};
+use core::ops;
+use core::panic::Location;
+#[cfg(feature = "std")]
+use std::fs;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -152,9 +152,6 @@ impl From<String> for Box<dyn Diagnostic + Send + Sync> {
     fn from(s: String) -> Self {
         struct StringError(String);
 
-        #[cfg(feature = "std")]
-        impl std::error::Error for StringError {}
-        #[cfg(not(feature = "std"))]
         impl crate::StdError for StringError {}
         impl Diagnostic for StringError {}
 

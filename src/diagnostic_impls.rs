@@ -3,12 +3,10 @@ Default trait implementations for [`Diagnostic`].
 */
 extern crate alloc;
 
-use core::{convert::Infallible, fmt::Display};
 use alloc::boxed::Box;
+use core::{convert::Infallible, fmt::Display};
 
-use crate::{Diagnostic, LabeledSpan, Severity, SourceCode, StdError};
-
-impl StdError for Infallible {}
+use crate::{Diagnostic, LabeledSpan, Severity, SourceCode};
 
 impl Diagnostic for Infallible {
     fn code<'a>(&'a self) -> Option<Box<dyn Display + 'a>> {

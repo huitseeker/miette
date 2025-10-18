@@ -1,13 +1,13 @@
 extern crate alloc;
 
-#[cfg(feature = "std")]
-use std::io;
-#[cfg(feature = "std")]
-use std::error::Error;
 #[cfg(not(feature = "std"))]
 use crate::StdError as Error;
-use core::fmt::{self, Display};
 use alloc::boxed::Box;
+use core::fmt::{self, Display};
+#[cfg(feature = "std")]
+use std::error::Error;
+#[cfg(feature = "std")]
+use std::io;
 
 use crate::Diagnostic;
 
@@ -83,17 +83,17 @@ impl Diagnostic for MietteError {
         };
         Some(Box::new(alloc::format!(
             "https://docs.rs/miette/{}/miette/enum.MietteError.html{}",
-            crate_version, variant,
+            crate_version,
+            variant,
         )))
     }
 }
 
 #[cfg(test)]
 pub(crate) mod tests {
-    #[cfg(feature = "std")]
-  use std::io::ErrorKind;
-  #[cfg(not(feature = "std"))]
-  use crate::StdError as Error;
+    #[cfg(not(feature = "std"))]
+    use crate::StdError as Error;
+    use std::string::ToString;
 
     use super::*;
 
@@ -126,9 +126,9 @@ pub(crate) mod tests {
     #[cfg(feature = "std")]
     #[test]
     fn io_error() {
-        let inner_error = io::Error::new(ErrorKind::Other, "halt and catch fire");
+        let inner_error = io::Error::other("halt and catch fire");
         let outer_error = TestError(inner_error);
-        let io_error = io::Error::new(ErrorKind::Other, outer_error);
+        let io_error = io::Error::other(outer_error);
 
         let miette_error = MietteError::from(io_error);
 

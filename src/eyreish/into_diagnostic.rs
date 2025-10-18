@@ -1,10 +1,6 @@
 extern crate alloc;
 
-#[cfg(feature = "std")]
-use std::error::Error;
-#[cfg(not(feature = "std"))]
 use crate::StdError as Error;
-use core::fmt::Display;
 use alloc::boxed::Box;
 
 use crate::{Diagnostic, Report};
@@ -42,11 +38,13 @@ inaccessible. If you have a type implementing [`Diagnostic`] consider simply ret
 pub trait IntoDiagnostic<T, E> {
     /// Converts [`Result`] types that return regular [`std::error::Error`]s
     /// into a [`Result`] that returns a [`Diagnostic`].
+    #[cfg_attr(track_caller, track_caller)]
     fn into_diagnostic(self) -> Result<T, Report>;
 }
 
 #[cfg(feature = "std")]
 impl<T, E: std::error::Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> {
+    #[cfg_attr(track_caller, track_caller)]
     fn into_diagnostic(self) -> Result<T, Report> {
         self.map_err(|e| DiagnosticError(Box::new(e)).into())
     }
@@ -54,6 +52,7 @@ impl<T, E: std::error::Error + Send + Sync + 'static> IntoDiagnostic<T, E> for R
 
 #[cfg(not(feature = "std"))]
 impl<T, E: Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> {
+    #[cfg_attr(track_caller, track_caller)]
     fn into_diagnostic(self) -> Result<T, Report> {
         self.map_err(|e| DiagnosticError(Box::new(e)).into())
     }
@@ -62,7 +61,9 @@ impl<T, E: Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> 
 #[cfg(test)]
 mod tests {
     #[cfg(feature = "std")]
-    use std::io::{self, ErrorKind};
+    use std::io::{self};
+    #[cfg(feature = "std")]
+    use std::string::ToString;
 
     use super::*;
 
@@ -72,7 +73,7 @@ mod tests {
     #[cfg(feature = "std")]
     #[test]
     fn diagnostic_error() {
-        let inner_error = io::Error::new(ErrorKind::Other, "halt and catch fire");
+        let inner_error = io::Error::other("halt and catch fire");
         let outer_error: Result<(), _> = Err(TestError(inner_error));
 
         let diagnostic_error = outer_error.into_diagnostic().unwrap_err();

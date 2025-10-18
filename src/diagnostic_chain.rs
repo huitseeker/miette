@@ -2,10 +2,7 @@
 Iterate over error `.diagnostic_source()` chains.
 */
 
-extern crate alloc;
-
 use crate::protocol::Diagnostic;
-use alloc::string::ToString;
 
 /// Iterator of a chain of cause errors.
 #[derive(Clone, Default)]

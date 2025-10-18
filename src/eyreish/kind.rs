@@ -56,6 +56,9 @@ use crate::Diagnostic;
 #[cfg(not(feature = "std"))]
 use alloc::boxed::Box;
 
+#[cfg(feature = "std")]
+use std::boxed::Box;
+
 pub struct Adhoc;
 
 pub trait AdhocKind: Sized {

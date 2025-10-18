@@ -7,9 +7,9 @@ use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 use crate::diagnostic_chain::DiagnosticChain;
 use crate::protocol::{Diagnostic, Severity};
 use crate::{LabeledSpan, MietteError, ReportHandler, SourceCode, SourceSpan, SpanContents};
+use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 /**
 [`ReportHandler`] that renders plain text and avoids extraneous graphics.

@@ -1,8 +1,8 @@
 #![no_std]
-
 #![deny(missing_docs, missing_debug_implementations, nonstandard_style)]
 #![warn(unreachable_pub, rust_2018_idioms)]
 #![allow(unexpected_cfgs)]
+
 //! You run miette? You run her code like the software? Oh. Oh! Error code for
 //! coder! Error code for One Thousand Lines!
 //!
@@ -98,6 +98,7 @@
 //! ## Example
 //!
 //! ```rust
+//! # extern crate alloc;
 //! /*
 //! You can derive a `Diagnostic` from any `std::error::Error` type.
 //!
@@ -195,6 +196,7 @@
 //! the trait directly, just like with `std::error::Error`.
 //!
 //! ```rust
+//! # extern crate alloc;
 //! // lib/error.rs
 //! use miette::{Diagnostic, SourceSpan};
 //! use thiserror::Error;
@@ -362,6 +364,7 @@
 //! attribute:
 //!
 //! ```rust
+//! # extern crate alloc;
 //! use miette::Diagnostic;
 //! use thiserror::Error;
 //!
@@ -382,6 +385,7 @@
 //! (very high quality and detailed!) documentation on this diagnostic:
 //!
 //! ```rust
+//! # extern crate alloc;
 //! use miette::Diagnostic;
 //! use thiserror::Error;
 //!
@@ -412,6 +416,7 @@
 //! `derive(Diagnostic)` macro:
 //!
 //! ```rust
+//! # extern crate alloc;
 //! use miette::{Diagnostic, SourceSpan};
 //! use thiserror::Error;
 //!
@@ -450,6 +455,7 @@
 //! enum variants:
 //!
 //! ```rust
+//! # extern crate alloc;
 //! use miette::Diagnostic;
 //! use thiserror::Error;
 //!
@@ -463,6 +469,7 @@
 //! your diagnostic:
 //!
 //! ```rust
+//! # extern crate alloc;
 //! use miette::Diagnostic;
 //! use thiserror::Error;
 //!
@@ -501,6 +508,7 @@
 //! `Diagnostic` type:
 //!
 //! ```rust
+//! # extern crate alloc;
 //! use miette::Diagnostic;
 //! use thiserror::Error;
 //!
@@ -519,6 +527,7 @@
 //! method for that:
 //!
 //! ```rust,no_run
+//! # extern crate alloc;
 //! use miette::{Diagnostic, SourceSpan};
 //! use thiserror::Error;
 //!
@@ -551,6 +560,7 @@
 //! emitted at the same time:
 //!
 //! ```rust,no_run
+//! # extern crate alloc;
 //! use miette::{Diagnostic, Report, SourceSpan};
 //! use thiserror::Error;
 //!
@@ -612,6 +622,7 @@
 //! will likely want to use _both_:
 //!
 //! ```rust
+//! # extern crate alloc;
 //! use miette::Diagnostic;
 //! use thiserror::Error;
 //!
@@ -817,6 +828,11 @@
 //! and some from [`thiserror`](https://github.com/dtolnay/thiserror), also
 //! under the Apache License. Some code is taken from
 //! [`ariadne`](https://github.com/zesterer/ariadne), which is MIT licensed.
+
+// For doctests that use Diagnostic derive macro
+#[cfg(test)]
+extern crate alloc;
+
 #[cfg(feature = "std")]
 extern crate std;
 

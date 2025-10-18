@@ -1,4 +1,11 @@
-use std::{error::Error, fmt::Display};
+use std::boxed::Box;
+use std::{
+    eprintln,
+    error::Error,
+    fmt::Display,
+    format,
+    string::{String, ToString},
+};
 
 use backtrace::Backtrace;
 
@@ -104,7 +111,7 @@ impl Panic {
 
 #[cfg(test)]
 mod tests {
-    use std::error::Error;
+    use std::{borrow::ToOwned, error::Error};
 
     use super::*;
 

@@ -1,14 +1,13 @@
 extern crate alloc;
 
+#[cfg(not(feature = "std"))]
+use crate::StdError as Error;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::fmt::{Debug, Display};
 #[cfg(feature = "std")]
 use std::error::Error;
-#[cfg(not(feature = "std"))]
-use crate::StdError as Error;
-use alloc::string::String;
-use alloc::vec::{self, Vec};
-use alloc::format;
-use alloc::boxed::Box;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
