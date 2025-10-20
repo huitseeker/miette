@@ -209,13 +209,16 @@ impl<C> StdError for WithSourceCode<Report, C> {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "std"))]
 mod tests {
-    
+    #[cfg(feature = "fancy")]
+    use std::format;
     use std::{
         boxed::Box,
         string::{String, ToString},
     };
+    #[cfg(feature = "fancy")]
+    use std::{vec, vec::Vec};
     use thiserror::Error;
 
     use crate::{Diagnostic, LabeledSpan, Report, SourceCode, SourceSpan};

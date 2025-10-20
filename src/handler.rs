@@ -345,15 +345,27 @@ impl MietteHandlerOpts {
         }
     }
 
+    #[allow(clippy::manual_unwrap_or)]
     pub(crate) fn is_graphical(&self) -> bool {
         if let Some(force_narrated) = self.force_narrated {
             !force_narrated
         } else if let Some(force_graphical) = self.force_graphical {
             force_graphical
-        } else if let Ok(env) = std::env::var("NO_GRAPHICS") {
-            env == "0"
         } else {
-            true
+            #[cfg(feature = "fancy-no-syscall")]
+            {
+                // In no-std environment, assume graphics are available
+                true
+            }
+            #[cfg(not(feature = "fancy-no-syscall"))]
+            {
+                // In std environment, check NO_GRAPHICS env var
+                if let Ok(env) = std::env::var("NO_GRAPHICS") {
+                    env == "0"
+                } else {
+                    true
+                }
+            }
         }
     }
 
@@ -501,7 +513,7 @@ mod syscall {
                 // In no-std environment without color support, default to no color support
                 false
             } else {
-                supports_color::on(supports_color::Stream::Stderr).is_some()
+                true // Fallback to assuming color support
             }
         }
     }
@@ -515,7 +527,7 @@ mod syscall {
                 // In no-std environment without color support, default to no RGB color support
                 Some(false)
             } else {
-                supports_color::on(supports_color::Stream::Stderr).map(|color| color.has_16m)
+                Some(true) // Fallback to assuming RGB support
             }
         }
     }

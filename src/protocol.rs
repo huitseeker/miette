@@ -9,6 +9,7 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use core::fmt::{self, Display};
 use core::ops;
+#[cfg(feature = "std")]
 use core::panic::Location;
 #[cfg(feature = "std")]
 use std::fs;
@@ -16,7 +17,7 @@ use std::fs;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::{DiagnosticError, MietteError};
+use crate::MietteError;
 
 /// Adds rich metadata to your Error that can be used by
 /// [`Report`](crate::Report) to print really nice and human-friendly error
@@ -171,6 +172,9 @@ impl From<String> for Box<dyn Diagnostic + Send + Sync> {
         Box::new(StringError(s))
     }
 }
+
+#[cfg(feature = "std")]
+use crate::DiagnosticError;
 
 #[cfg(feature = "std")]
 impl From<Box<dyn std::error::Error + Send + Sync>> for Box<dyn Diagnostic + Send + Sync> {

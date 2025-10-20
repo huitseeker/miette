@@ -71,12 +71,20 @@ impl GraphicalTheme {
 
 impl Default for GraphicalTheme {
     fn default() -> Self {
-        match std::env::var("NO_COLOR") {
-            _ if !std::io::stdout().is_terminal() || !std::io::stderr().is_terminal() => {
-                Self::none()
+        #[cfg(feature = "fancy-no-syscall")]
+        {
+            // In no-std environments, default to no-color mode
+            Self::unicode_nocolor()
+        }
+        #[cfg(not(feature = "fancy-no-syscall"))]
+        {
+            match std::env::var("NO_COLOR") {
+                _ if !std::io::stdout().is_terminal() || !std::io::stderr().is_terminal() => {
+                    Self::none()
+                }
+                Ok(string) if string != "0" => Self::unicode_nocolor(),
+                _ => Self::unicode(),
             }
-            Ok(string) if string != "0" => Self::unicode_nocolor(),
-            _ => Self::unicode(),
         }
     }
 }

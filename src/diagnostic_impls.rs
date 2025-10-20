@@ -8,6 +8,9 @@ use core::{convert::Infallible, fmt::Display};
 
 use crate::{Diagnostic, LabeledSpan, Severity, SourceCode};
 
+#[cfg(not(feature = "std"))]
+impl crate::StdError for Infallible {}
+
 impl Diagnostic for Infallible {
     fn code<'a>(&'a self) -> Option<Box<dyn Display + 'a>> {
         match *self {}
