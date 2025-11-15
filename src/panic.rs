@@ -1,4 +1,6 @@
+#[cfg(feature = "std")]
 use std::boxed::Box;
+#[cfg(feature = "std")]
 use std::{
     eprintln,
     error::Error,
@@ -7,11 +9,14 @@ use std::{
     string::{String, ToString},
 };
 
+#[cfg(feature = "std")]
 use backtrace::Backtrace;
 
+#[cfg(feature = "std")]
 use crate::{Context, Diagnostic, Result};
 
-/// Tells miette to render panics using its rendering engine.
+/// Makes miette show pretty error messages when your program crashes.
+#[cfg(feature = "std")]
 pub fn set_panic_hook() {
     std::panic::set_hook(Box::new(move |info| {
         let mut message = "Something went wrong".to_string();
@@ -33,9 +38,20 @@ pub fn set_panic_hook() {
     }));
 }
 
+/// Makes miette show pretty error messages when your program crashes.
+///
+/// On computers without the standard library, this function does nothing
+/// because crash hooks need the standard library to work.
+#[cfg(not(feature = "std"))]
+pub fn set_panic_hook() {
+    // Does nothing on computers without the standard library
+}
+
 #[derive(Debug)]
+#[cfg(feature = "std")]
 struct Panic(String);
 
+#[cfg(feature = "std")]
 impl Display for Panic {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let msg = &self.0;
@@ -44,8 +60,10 @@ impl Display for Panic {
     }
 }
 
+#[cfg(feature = "std")]
 impl Error for Panic {}
 
+#[cfg(feature = "std")]
 impl Diagnostic for Panic {
     fn help<'a>(&'a self) -> Option<Box<dyn Display + 'a>> {
         Some(Box::new(
@@ -54,6 +72,7 @@ impl Diagnostic for Panic {
     }
 }
 
+#[cfg(feature = "std")]
 impl Panic {
     fn backtrace() -> String {
         use std::fmt::Write;
@@ -110,6 +129,7 @@ impl Panic {
 }
 
 #[cfg(test)]
+#[cfg(feature = "std")]
 mod tests {
     use std::{borrow::ToOwned, error::Error};
 

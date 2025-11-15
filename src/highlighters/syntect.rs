@@ -1,3 +1,4 @@
+use core::str;
 use std::path::Path;
 
 extern crate alloc;

@@ -60,12 +60,11 @@ impl<T, E: Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> 
 
 #[cfg(test)]
 mod tests {
+    use super::IntoDiagnostic;
     #[cfg(feature = "std")]
     use std::io::{self};
     #[cfg(feature = "std")]
     use std::string::ToString;
-
-    use super::*;
 
     #[cfg(feature = "std")]
     use crate::error::tests::TestError;

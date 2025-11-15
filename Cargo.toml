@@ -65,7 +65,7 @@ fancy-no-backtrace = [
     "dep:supports-unicode",
 ]
 fancy = ["fancy-no-backtrace", "dep:backtrace", "dep:backtrace-ext"]
-syntect-highlighter = ["fancy-no-backtrace", "dep:syntect"]
+syntect-highlighter = ["fancy-no-backtrace", "dep:syntect", "std"]
 
 [workspace]
 members = ["miette-derive"]

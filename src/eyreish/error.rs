@@ -817,14 +817,6 @@ impl AsRef<dyn StdError> for Report {
     }
 }
 
-#[cfg(feature = "std")]
-impl std::borrow::Borrow<dyn Diagnostic> for Report {
-    fn borrow(&self) -> &(dyn Diagnostic + 'static) {
-        self.as_ref()
-    }
-}
-
-#[cfg(not(feature = "std"))]
 impl core::borrow::Borrow<dyn Diagnostic> for Report {
     fn borrow(&self) -> &(dyn Diagnostic + 'static) {
         self.as_ref()

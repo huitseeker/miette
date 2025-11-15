@@ -357,7 +357,7 @@ impl MietteHandlerOpts {
                 // In no-std environment, assume graphics are available
                 true
             }
-            #[cfg(not(feature = "fancy-no-syscall"))]
+            #[cfg(all(not(feature = "fancy-no-syscall"), feature = "std"))]
             {
                 // In std environment, check NO_GRAPHICS env var
                 if let Ok(env) = std::env::var("NO_GRAPHICS") {
@@ -365,6 +365,11 @@ impl MietteHandlerOpts {
                 } else {
                     true
                 }
+            }
+            #[cfg(all(not(feature = "fancy-no-syscall"), not(feature = "std")))]
+            {
+                // In no-std environment without fancy-no-syscall, default to true
+                true
             }
         }
     }
@@ -487,8 +492,10 @@ mod syscall {
         cfg_if! {
             if #[cfg(any(feature = "fancy-no-syscall", miri))] {
                 None
-            } else {
+            } else if #[cfg(feature = "fancy-no-backtrace")] {
                 terminal_size::terminal_size().map(|size| size.0 .0 as usize)
+            } else {
+                None
             }
         }
     }
@@ -498,8 +505,10 @@ mod syscall {
         cfg_if! {
             if #[cfg(feature = "fancy-no-syscall")] {
                 false
-            } else {
+            } else if #[cfg(feature = "fancy-no-backtrace")] {
                 supports_hyperlinks::on(supports_hyperlinks::Stream::Stderr)
+            } else {
+                false
             }
         }
     }
@@ -507,13 +516,18 @@ mod syscall {
     #[inline]
     pub(super) fn supports_color() -> bool {
         cfg_if! {
-            if #[cfg(feature = "fancy-no-backtrace")] {
+            if #[cfg(all(feature = "fancy", not(feature = "fancy-no-syscall")))] {
+                // Standard fancy mode with full std support
                 supports_color::on(supports_color::Stream::Stderr).is_some()
-            } else if #[cfg(feature = "fancy-no-syscall")] {
-                // In no-std environment without color support, default to no color support
+            } else if #[cfg(all(feature = "fancy", feature = "fancy-no-backtrace"))] {
+                // Fancy mode without backtrace but with color support
+                supports_color::on(supports_color::Stream::Stderr).is_some()
+            } else if #[cfg(not(feature = "std"))] {
+                // No-std environment - no color support by default
                 false
             } else {
-                true // Fallback to assuming color support
+                // All other cases - no color support
+                false
             }
         }
     }
@@ -537,8 +551,10 @@ mod syscall {
         cfg_if! {
             if #[cfg(feature = "fancy-no-syscall")] {
                 false
-            } else {
+            } else if #[cfg(feature = "fancy-no-backtrace")] {
                 supports_unicode::on(supports_unicode::Stream::Stderr)
+            } else {
+                false
             }
         }
     }

@@ -93,6 +93,9 @@ impl Diagnostic for MietteError {
 pub(crate) mod tests {
     #[cfg(not(feature = "std"))]
     use crate::StdError as Error;
+    #[cfg(not(feature = "std"))]
+    use alloc::string::ToString;
+    #[cfg(feature = "std")]
     use std::string::ToString;
 
     use super::*;
@@ -101,6 +104,7 @@ pub(crate) mod tests {
     #[cfg(feature = "std")]
     pub(crate) struct TestError(pub(crate) io::Error);
     #[cfg(not(feature = "std"))]
+    #[derive(Debug)]
     pub(crate) struct TestError(pub(crate) &'static str);
 
     impl Display for TestError {
