@@ -14,7 +14,7 @@ mod ext {
     use super::*;
 
     pub trait Diag {
-        #[cfg_attr(track_caller, track_caller)]
+        #[track_caller]
         fn ext_report<D>(self, msg: D) -> Report
         where
             D: Display + Send + Sync + 'static;
@@ -24,7 +24,7 @@ mod ext {
     where
         E: Diagnostic + Send + Sync + 'static,
     {
-        #[cfg_attr(track_caller, track_caller)]
+        #[track_caller]
         fn ext_report<D>(self, msg: D) -> Report
         where
             D: Display + Send + Sync + 'static,
@@ -34,7 +34,7 @@ mod ext {
     }
 
     impl Diag for Report {
-        #[cfg_attr(track_caller, track_caller)]
+        #[track_caller]
         fn ext_report<D>(self, msg: D) -> Report
         where
             D: Display + Send + Sync + 'static,
@@ -45,7 +45,7 @@ mod ext {
 }
 
 impl<T> WrapErr<T, Infallible> for Option<T> {
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn wrap_err<D>(self, msg: D) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,
@@ -56,7 +56,7 @@ impl<T> WrapErr<T, Infallible> for Option<T> {
         }
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn wrap_err_with<D, F>(self, msg: F) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,
@@ -68,7 +68,7 @@ impl<T> WrapErr<T, Infallible> for Option<T> {
         }
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn context<D>(self, msg: D) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,
@@ -76,7 +76,7 @@ impl<T> WrapErr<T, Infallible> for Option<T> {
         self.wrap_err(msg)
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn with_context<D, F>(self, msg: F) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,
@@ -90,7 +90,7 @@ impl<T, E> WrapErr<T, E> for Result<T, E>
 where
     E: ext::Diag + Send + Sync + 'static,
 {
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn wrap_err<D>(self, msg: D) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,
@@ -101,7 +101,7 @@ where
         }
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn wrap_err_with<D, F>(self, msg: F) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,
@@ -113,7 +113,7 @@ where
         }
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn context<D>(self, msg: D) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,
@@ -121,7 +121,7 @@ where
         self.wrap_err(msg)
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     fn with_context<D, F>(self, msg: F) -> Result<T, Report>
     where
         D: Display + Send + Sync + 'static,

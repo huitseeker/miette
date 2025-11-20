@@ -23,7 +23,7 @@ impl Report {
     ///
     /// If the error type does not provide a backtrace, a backtrace will be
     /// created here to ensure that a backtrace exists.
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     #[cold]
     pub fn new<E>(error: E) -> Self
     where
@@ -69,7 +69,7 @@ impl Report {
     ///         .await
     /// }
     /// ```
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     #[cold]
     pub fn msg<M>(message: M) -> Self
     where
@@ -85,7 +85,7 @@ impl Report {
     ///
     /// Boxed `Diagnostic`s don't implement `Diagnostic` themselves due to trait coherence issues.
     /// This method allows you to create a `Report` from a boxed `Diagnostic`.
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     pub fn new_boxed(error: Box<dyn Diagnostic + Send + Sync + 'static>) -> Self {
         Report::from_boxed(error)
     }
@@ -111,7 +111,7 @@ impl Report {
         unsafe { Report::construct(error, vtable, handler) }
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     #[cold]
     pub(crate) fn from_adhoc<M>(message: M) -> Self
     where
@@ -136,7 +136,7 @@ impl Report {
         unsafe { Report::construct(error, vtable, handler) }
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     #[cold]
     pub(crate) fn from_msg<D, E>(msg: D, error: E) -> Self
     where
@@ -161,7 +161,7 @@ impl Report {
         unsafe { Report::construct(error, vtable, handler) }
     }
 
-    #[cfg_attr(track_caller, track_caller)]
+    #[track_caller]
     #[cold]
     pub(crate) fn from_boxed(error: Box<dyn Diagnostic + Send + Sync>) -> Self {
         use super::wrapper::BoxedError;
