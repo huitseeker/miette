@@ -68,7 +68,7 @@ pub type ErrorHook =
 #[cfg(feature = "std")]
 static HOOK: OnceLock<ErrorHook> = OnceLock::new();
 
-#[cfg(not(feature = "std"))]
+#[cfg(all(not(feature = "std"), feature = "spin"))]
 static HOOK: spin::Once<ErrorHook> = spin::Once::new();
 
 fn default_hook() -> ErrorHook {
@@ -96,7 +96,7 @@ pub fn set_hook(hook: ErrorHook) -> Result<(), InstallError> {
 }
 
 /// Set the error hook.
-#[cfg(not(feature = "std"))]
+#[cfg(all(not(feature = "std"), feature = "spin"))]
 pub fn set_hook(hook: ErrorHook) -> Result<(), InstallError> {
     HOOK.call_once(|| hook);
     Ok(())
@@ -108,7 +108,7 @@ pub(crate) fn capture_handler(error: &(dyn Diagnostic + 'static)) -> Box<dyn Rep
     hook(error)
 }
 
-#[cfg(not(feature = "std"))]
+#[cfg(all(not(feature = "std"), feature = "spin"))]
 pub(crate) fn capture_handler(error: &(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> {
     let hook = HOOK.call_once(default_hook);
     hook(error)
@@ -126,7 +126,7 @@ pub(crate) fn capture_handler_with_location(
 }
 
 #[track_caller]
-#[cfg(not(feature = "std"))]
+#[cfg(all(not(feature = "std"), feature = "spin"))]
 pub(crate) fn capture_handler_with_location(
     error: &(dyn Diagnostic + 'static),
 ) -> Box<dyn ReportHandler> {
