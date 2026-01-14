@@ -8,8 +8,8 @@ use core::{convert::Infallible, fmt::Display};
 
 use crate::{Diagnostic, LabeledSpan, Severity, SourceCode};
 
-#[cfg(not(feature = "std"))]
-impl crate::StdError for Infallible {}
+// Note: Infallible implements core::error::Error since Rust 1.81,
+// so we don't need to provide our own StdError impl.
 
 impl Diagnostic for Infallible {
     fn code<'a>(&'a self) -> Option<Box<dyn Display + 'a>> {

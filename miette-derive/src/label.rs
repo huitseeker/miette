@@ -226,7 +226,7 @@ impl Labels {
 
         Some(quote! {
             #[allow(unused_variables)]
-            fn labels(&self) -> Option<alloc::boxed::Box<dyn Iterator<Item = miette::LabeledSpan> + '_>> {
+            fn labels(&self) -> Option<miette::__alloc::Box<dyn Iterator<Item = miette::LabeledSpan> + '_>> {
                 use miette::macro_helpers::ToOption;
                 let Self #display_pat = self;
 
@@ -236,7 +236,7 @@ impl Labels {
                 .into_iter()
                 #(#collections_chain)*;
 
-                Option::Some(alloc::boxed::Box::new(labels_iter.filter(Option::is_some).map(Option::unwrap)))
+                Option::Some(miette::__alloc::Box::new(labels_iter.filter(Option::is_some).map(Option::unwrap)))
             }
         })
     }
@@ -322,7 +322,7 @@ impl Labels {
                                 ]
                                 .into_iter()
                                 #(#collections_chain)*;
-                                Option::Some(alloc::boxed::Box::new(labels_iter.filter(Option::is_some).map(Option::unwrap)))
+                                Option::Some(miette::__alloc::Box::new(labels_iter.filter(Option::is_some).map(Option::unwrap)))
                             }
                         }),
                     }

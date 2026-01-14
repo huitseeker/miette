@@ -1,7 +1,7 @@
 extern crate alloc;
 
-use crate::StdError as Error;
 use alloc::boxed::Box;
+use core::error::Error;
 
 use crate::{Diagnostic, Report};
 
@@ -42,15 +42,6 @@ pub trait IntoDiagnostic<T, E> {
     fn into_diagnostic(self) -> Result<T, Report>;
 }
 
-#[cfg(feature = "std")]
-impl<T, E: std::error::Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> {
-    #[track_caller]
-    fn into_diagnostic(self) -> Result<T, Report> {
-        self.map_err(|e| DiagnosticError(Box::new(e)).into())
-    }
-}
-
-#[cfg(not(feature = "std"))]
 impl<T, E: Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> {
     #[track_caller]
     fn into_diagnostic(self) -> Result<T, Report> {
@@ -60,11 +51,13 @@ impl<T, E: Error + Send + Sync + 'static> IntoDiagnostic<T, E> for Result<T, E> 
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
+
+    use alloc::string::ToString;
+
     use super::IntoDiagnostic;
     #[cfg(feature = "std")]
-    use std::io::{self};
-    #[cfg(feature = "std")]
-    use std::string::ToString;
+    use std::io;
 
     #[cfg(feature = "std")]
     use crate::error::tests::TestError;

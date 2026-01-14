@@ -56,13 +56,13 @@ impl Code {
                 let code = &code.as_ref()?.0;
                 Some(match fields {
                     syn::Fields::Named(_) => {
-                        quote! { Self::#ident { .. } => core::option::Option::Some(alloc::boxed::Box::new(#code)), }
+                        quote! { Self::#ident { .. } => core::option::Option::Some(miette::__alloc::Box::new(#code)), }
                     }
                     syn::Fields::Unnamed(_) => {
-                        quote! { Self::#ident(..) => core::option::Option::Some(alloc::boxed::Box::new(#code)), }
+                        quote! { Self::#ident(..) => core::option::Option::Some(miette::__alloc::Box::new(#code)), }
                     }
                     syn::Fields::Unit => {
-                        quote! { Self::#ident => core::option::Option::Some(alloc::boxed::Box::new(#code)), }
+                        quote! { Self::#ident => core::option::Option::Some(miette::__alloc::Box::new(#code)), }
                     }
                 })
             },
@@ -72,8 +72,8 @@ impl Code {
     pub(crate) fn gen_struct(&self) -> Option<TokenStream> {
         let code = &self.0;
         Some(quote! {
-            fn code(&self) -> core::option::Option<alloc::boxed::Box<dyn core::fmt::Display + '_>> {
-                core::option::Option::Some(alloc::boxed::Box::new(#code))
+            fn code(&self) -> core::option::Option<miette::__alloc::Box<dyn core::fmt::Display + '_>> {
+                core::option::Option::Some(miette::__alloc::Box::new(#code))
             }
         })
     }

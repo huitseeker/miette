@@ -1,11 +1,8 @@
 extern crate alloc;
 
-#[cfg(not(feature = "std"))]
-use crate::StdError as Error;
 use alloc::boxed::Box;
+use core::error::Error;
 use core::fmt::{self, Display};
-#[cfg(feature = "std")]
-use std::error::Error;
 #[cfg(feature = "std")]
 use std::io;
 
@@ -93,10 +90,7 @@ impl Diagnostic for MietteError {
 pub(crate) mod tests {
     #[cfg(not(feature = "std"))]
     use crate::StdError as Error;
-    #[cfg(not(feature = "std"))]
     use alloc::string::ToString;
-    #[cfg(feature = "std")]
-    use std::string::ToString;
 
     use super::*;
 

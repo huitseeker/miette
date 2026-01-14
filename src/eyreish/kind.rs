@@ -45,19 +45,13 @@
 //     let error = $msg;
 //     (&error).miette_kind().new(error)
 
-#[cfg(not(feature = "std"))]
 extern crate alloc;
 
-use super::Report;
+use alloc::boxed::Box;
 use core::fmt::{Debug, Display};
 
+use super::Report;
 use crate::Diagnostic;
-
-#[cfg(not(feature = "std"))]
-use alloc::boxed::Box;
-
-#[cfg(feature = "std")]
-use std::boxed::Box;
 
 pub struct Adhoc;
 

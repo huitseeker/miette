@@ -96,7 +96,7 @@ impl Url {
                     }
                 };
                 Some(quote! {
-                    Self::#ident #pat => Option::Some(alloc::boxed::Box::new(format!(#fmt #args))),
+                    Self::#ident #pat => Option::Some(miette::__alloc::Box::new(format!(#fmt #args))),
                 })
             },
         )
@@ -129,10 +129,10 @@ impl Url {
             }
         };
         Some(quote! {
-            fn url(&self) -> Option<alloc::boxed::Box<dyn core::fmt::Display + '_>> {
+            fn url(&self) -> Option<miette::__alloc::Box<dyn core::fmt::Display + '_>> {
                 #[allow(unused_variables, deprecated)]
                 let Self #pat = self;
-                Option::Some(alloc::boxed::Box::new(format!(#fmt #args)))
+                Option::Some(miette::__alloc::Box::new(format!(#fmt #args)))
             }
         })
     }

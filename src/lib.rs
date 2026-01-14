@@ -1,6 +1,11 @@
 #![no_std]
 #![deny(missing_docs, missing_debug_implementations, nonstandard_style)]
 #![warn(unreachable_pub, rust_2018_idioms)]
+#![warn(
+    clippy::alloc_instead_of_core,
+    clippy::std_instead_of_core,
+    clippy::std_instead_of_alloc
+)]
 #![allow(unexpected_cfgs)]
 
 //! You run miette? You run her code like the software? Oh. Oh! Error code for
@@ -845,18 +850,13 @@
 #[cfg(feature = "std")]
 extern crate std;
 
-#[cfg(feature = "std")]
-pub use std::error::Error as StdError;
+pub use core::error::Error as StdError;
 
-#[cfg(not(feature = "std"))]
-/// Compatibility trait for error handling in no_std environments.
-/// This trait provides a subset of `std::error::Error` functionality
-/// suitable for no_std environments.
-pub trait StdError: core::fmt::Debug + core::fmt::Display {
-    /// Returns the lower-level source of this error, if any.
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        None
-    }
+#[doc(hidden)]
+pub mod __alloc {
+    extern crate alloc;
+    pub use alloc::borrow;
+    pub use alloc::boxed::Box;
 }
 
 #[cfg(feature = "derive")]

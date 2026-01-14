@@ -84,22 +84,16 @@ impl MietteHighlighter {
 
 impl Default for MietteHighlighter {
     fn default() -> Self {
-        #[cfg(all(feature = "syntect-highlighter", not(feature = "fancy-no-syscall")))]
+        #[cfg(feature = "syntect-highlighter")]
         {
             use std::io::IsTerminal;
             match std::env::var("NO_COLOR") {
                 _ if !std::io::stdout().is_terminal() || !std::io::stderr().is_terminal() => {
-                    //TODO: should use ANSI styling instead of 24-bit truecolor here
                     Self(Arc::new(SyntectHighlighter::default()))
                 }
                 Ok(string) if string != "0" => MietteHighlighter::nocolor(),
                 _ => Self(Arc::new(SyntectHighlighter::default())),
             }
-        }
-        #[cfg(all(feature = "syntect-highlighter", feature = "fancy-no-syscall"))]
-        {
-            // In no-std environment, use syntect but without terminal detection
-            Self(Arc::new(SyntectHighlighter::default()))
         }
         #[cfg(not(feature = "syntect-highlighter"))]
         {

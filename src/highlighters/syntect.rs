@@ -103,7 +103,7 @@ impl SyntectHighlighter {
         }
         // finally, attempt to guess syntax based on first line
         self.syntax_set.find_syntax_by_first_line(
-            std::str::from_utf8(contents.data())
+            core::str::from_utf8(contents.data())
                 .ok()?
                 .split('\n')
                 .next()?,

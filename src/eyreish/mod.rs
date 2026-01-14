@@ -9,11 +9,9 @@ extern crate alloc;
 use alloc::boxed::Box;
 use core::fmt::Display;
 
-#[cfg(not(feature = "std"))]
-use crate::StdError;
-use spin::Once;
+use core::error::Error as StdError;
 #[cfg(feature = "std")]
-use std::error::Error as StdError;
+use std::sync::OnceLock;
 
 #[allow(unreachable_pub)]
 pub use into_diagnostic::*;
@@ -67,7 +65,11 @@ unsafe impl Send for Report {}
 pub type ErrorHook =
     Box<dyn Fn(&(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> + Sync + Send + 'static>;
 
-static HOOK: Once<ErrorHook> = Once::new();
+#[cfg(feature = "std")]
+static HOOK: OnceLock<ErrorHook> = OnceLock::new();
+
+#[cfg(not(feature = "std"))]
+static HOOK: spin::Once<ErrorHook> = spin::Once::new();
 
 fn default_hook() -> ErrorHook {
     Box::new(get_default_printer)
@@ -87,39 +89,51 @@ impl core::fmt::Display for InstallError {
 impl StdError for InstallError {}
 impl Diagnostic for InstallError {}
 
-/**
-Set the error hook.
-*/
+/// Set the error hook.
+#[cfg(feature = "std")]
+pub fn set_hook(hook: ErrorHook) -> Result<(), InstallError> {
+    HOOK.set(hook).map_err(|_| InstallError)
+}
+
+/// Set the error hook.
+#[cfg(not(feature = "std"))]
 pub fn set_hook(hook: ErrorHook) -> Result<(), InstallError> {
     HOOK.call_once(|| hook);
     Ok(())
 }
 
+#[cfg(feature = "std")]
 pub(crate) fn capture_handler(error: &(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> {
-    static DEFAULT: Once<ErrorHook> = Once::new();
-    let hook = HOOK.get().unwrap_or_else(|| {
-        DEFAULT.call_once(|| default_hook());
-        DEFAULT.get().unwrap()
-    });
+    let hook = HOOK.get_or_init(default_hook);
+    hook(error)
+}
 
+#[cfg(not(feature = "std"))]
+pub(crate) fn capture_handler(error: &(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler> {
+    let hook = HOOK.call_once(default_hook);
     hook(error)
 }
 
 #[track_caller]
+#[cfg(feature = "std")]
 pub(crate) fn capture_handler_with_location(
     error: &(dyn Diagnostic + 'static),
 ) -> Box<dyn ReportHandler> {
-    static DEFAULT: Once<ErrorHook> = Once::new();
-    let hook = HOOK.get().unwrap_or_else(|| {
-        DEFAULT.call_once(|| default_hook());
-        DEFAULT.get().unwrap()
-    });
+    let hook = HOOK.get_or_init(default_hook);
+    let mut handler = hook(error);
+    handler.track_caller(core::panic::Location::caller());
+    handler
+}
 
-    {
-        let mut handler = hook(error);
-        handler.track_caller(core::panic::Location::caller());
-        handler
-    }
+#[track_caller]
+#[cfg(not(feature = "std"))]
+pub(crate) fn capture_handler_with_location(
+    error: &(dyn Diagnostic + 'static),
+) -> Box<dyn ReportHandler> {
+    let hook = HOOK.call_once(default_hook);
+    let mut handler = hook(error);
+    handler.track_caller(core::panic::Location::caller());
+    handler
 }
 
 fn get_default_printer(_err: &(dyn Diagnostic + 'static)) -> Box<dyn ReportHandler + 'static> {

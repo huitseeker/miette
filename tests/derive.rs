@@ -1,5 +1,4 @@
-#[allow(unused_assignments)] // some fields unused when feature="fancy"
-extern crate alloc;
+#![allow(unused_assignments)] // some fields unused when feature="fancy"
 
 use miette::{Diagnostic, Report, Severity, SourceSpan};
 use thiserror::Error;

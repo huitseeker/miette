@@ -71,13 +71,9 @@ impl GraphicalTheme {
 
 impl Default for GraphicalTheme {
     fn default() -> Self {
-        #[cfg(feature = "fancy-no-syscall")]
+        #[cfg(feature = "fancy-no-backtrace")]
         {
-            // In no-std environments, default to no-color mode
-            Self::unicode_nocolor()
-        }
-        #[cfg(all(not(feature = "fancy-no-syscall"), feature = "std"))]
-        {
+            use std::io::IsTerminal;
             match std::env::var("NO_COLOR") {
                 _ if !std::io::stdout().is_terminal() || !std::io::stderr().is_terminal() => {
                     Self::none()
@@ -86,10 +82,9 @@ impl Default for GraphicalTheme {
                 _ => Self::unicode(),
             }
         }
-        #[cfg(all(not(feature = "fancy-no-syscall"), not(feature = "std")))]
+        #[cfg(not(feature = "fancy-no-backtrace"))]
         {
-            // In no-std environment, default to unicode theme
-            Self::unicode()
+            Self::unicode_nocolor()
         }
     }
 }

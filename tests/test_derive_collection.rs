@@ -1,5 +1,3 @@
-extern crate alloc;
-
 use std::{
     collections::{LinkedList, VecDeque},
     ops::Range,

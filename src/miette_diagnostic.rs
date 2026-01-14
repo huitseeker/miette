@@ -1,13 +1,10 @@
 extern crate alloc;
 
-#[cfg(not(feature = "std"))]
-use crate::StdError as Error;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::error::Error;
 use core::fmt::{Debug, Display};
-#[cfg(feature = "std")]
-use std::error::Error;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -267,6 +264,7 @@ impl MietteDiagnostic {
 #[cfg(feature = "serde")]
 #[test]
 fn test_serialize_miette_diagnostic() {
+    use alloc::format;
     use serde_json::json;
 
     use crate::diagnostic;
@@ -317,6 +315,7 @@ fn test_serialize_miette_diagnostic() {
 #[cfg(feature = "serde")]
 #[test]
 fn test_deserialize_miette_diagnostic() {
+    use alloc::format;
     use serde_json::json;
 
     use crate::diagnostic;

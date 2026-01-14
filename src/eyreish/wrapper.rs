@@ -211,14 +211,14 @@ impl<C> StdError for WithSourceCode<Report, C> {
 
 #[cfg(all(test, feature = "std"))]
 mod tests {
+    extern crate alloc;
+
+    use alloc::boxed::Box;
     #[cfg(feature = "fancy")]
-    use std::format;
-    use std::{
-        boxed::Box,
-        string::{String, ToString},
-    };
+    use alloc::format;
+    use alloc::string::{String, ToString};
     #[cfg(feature = "fancy")]
-    use std::{vec, vec::Vec};
+    use alloc::{vec, vec::Vec};
     use thiserror::Error;
 
     use crate::{Diagnostic, LabeledSpan, Report, SourceCode, SourceSpan};
@@ -232,7 +232,7 @@ mod tests {
 
     impl Diagnostic for Inner {
         fn labels(&self) -> Option<Box<dyn Iterator<Item = LabeledSpan> + '_>> {
-            Some(Box::new(std::iter::once(LabeledSpan::underline(self.at))))
+            Some(Box::new(core::iter::once(LabeledSpan::underline(self.at))))
         }
 
         fn source_code(&self) -> Option<&dyn SourceCode> {

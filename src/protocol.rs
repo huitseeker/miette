@@ -177,8 +177,8 @@ impl From<String> for Box<dyn Diagnostic + Send + Sync> {
 use crate::DiagnosticError;
 
 #[cfg(feature = "std")]
-impl From<Box<dyn std::error::Error + Send + Sync>> for Box<dyn Diagnostic + Send + Sync> {
-    fn from(s: Box<dyn std::error::Error + Send + Sync>) -> Self {
+impl From<Box<dyn core::error::Error + Send + Sync>> for Box<dyn Diagnostic + Send + Sync> {
+    fn from(s: Box<dyn core::error::Error + Send + Sync>) -> Self {
         Box::new(DiagnosticError(s))
     }
 }
@@ -374,6 +374,7 @@ impl LabeledSpan {
 #[cfg(feature = "serde")]
 #[test]
 fn test_serialize_labeled_span() {
+    use alloc::string::ToString;
     use serde_json::json;
 
     assert_eq!(
@@ -397,6 +398,7 @@ fn test_serialize_labeled_span() {
 #[cfg(feature = "serde")]
 #[test]
 fn test_deserialize_labeled_span() {
+    use alloc::string::ToString;
     use serde_json::json;
 
     let span: LabeledSpan = serde_json::from_value(json!({

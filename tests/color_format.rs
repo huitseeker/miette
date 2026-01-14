@@ -1,7 +1,5 @@
 #![cfg(feature = "fancy-no-backtrace")]
 
-extern crate alloc;
-
 use miette::{Diagnostic, MietteHandler, MietteHandlerOpts, ReportHandler, RgbColors};
 use regex::Regex;
 use std::ffi::OsString;

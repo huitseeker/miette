@@ -59,7 +59,7 @@ impl DiagnosticSource {
                     };
                     quote! {
                         Self::#ident #display_pat => {
-                            core::option::Option::Some(alloc::borrow::Borrow::borrow(#rel))
+                            core::option::Option::Some(miette::__alloc::borrow::Borrow::borrow(#rel))
                         }
                     }
                 })
@@ -71,7 +71,7 @@ impl DiagnosticSource {
         let rel = &self.0;
         Some(quote! {
             fn diagnostic_source<'a>(&'a self) -> core::option::Option<&'a dyn miette::Diagnostic> {
-                core::option::Option::Some(alloc::borrow::Borrow::borrow(&self.#rel))
+                core::option::Option::Some(miette::__alloc::borrow::Borrow::borrow(&self.#rel))
             }
         })
     }

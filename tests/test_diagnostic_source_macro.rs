@@ -1,5 +1,3 @@
-extern crate alloc;
-
 use miette::Diagnostic;
 
 #[derive(Debug, miette::Diagnostic, thiserror::Error)]

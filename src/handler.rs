@@ -352,24 +352,17 @@ impl MietteHandlerOpts {
         } else if let Some(force_graphical) = self.force_graphical {
             force_graphical
         } else {
-            #[cfg(feature = "fancy-no-syscall")]
+            #[cfg(all(feature = "fancy-no-syscall", not(feature = "fancy-no-backtrace")))]
             {
-                // In no-std environment, assume graphics are available
                 true
             }
-            #[cfg(all(not(feature = "fancy-no-syscall"), feature = "std"))]
+            #[cfg(feature = "fancy-no-backtrace")]
             {
-                // In std environment, check NO_GRAPHICS env var
                 if let Ok(env) = std::env::var("NO_GRAPHICS") {
                     env == "0"
                 } else {
                     true
                 }
-            }
-            #[cfg(all(not(feature = "fancy-no-syscall"), not(feature = "std")))]
-            {
-                // In no-std environment without fancy-no-syscall, default to true
-                true
             }
         }
     }
@@ -485,77 +478,63 @@ impl From<HighlighterOption> for MietteHighlighter {
 }
 
 mod syscall {
-    use cfg_if::cfg_if;
-
     #[inline]
     pub(super) fn terminal_width() -> Option<usize> {
-        cfg_if! {
-            if #[cfg(any(feature = "fancy-no-syscall", miri))] {
-                None
-            } else if #[cfg(feature = "fancy-no-backtrace")] {
-                terminal_size::terminal_size().map(|size| size.0 .0 as usize)
-            } else {
-                None
-            }
+        #[cfg(all(feature = "fancy-no-backtrace", not(miri)))]
+        {
+            terminal_size::terminal_size().map(|size| size.0 .0 as usize)
+        }
+        #[cfg(any(not(feature = "fancy-no-backtrace"), miri))]
+        {
+            None
         }
     }
 
     #[inline]
     pub(super) fn supports_hyperlinks() -> bool {
-        cfg_if! {
-            if #[cfg(feature = "fancy-no-syscall")] {
-                false
-            } else if #[cfg(feature = "fancy-no-backtrace")] {
-                supports_hyperlinks::on(supports_hyperlinks::Stream::Stderr)
-            } else {
-                false
-            }
+        #[cfg(feature = "fancy-no-backtrace")]
+        {
+            supports_hyperlinks::on(supports_hyperlinks::Stream::Stderr)
+        }
+        #[cfg(not(feature = "fancy-no-backtrace"))]
+        {
+            false
         }
     }
 
     #[inline]
     pub(super) fn supports_color() -> bool {
-        cfg_if! {
-            if #[cfg(all(feature = "fancy", not(feature = "fancy-no-syscall")))] {
-                // Standard fancy mode with full std support
-                supports_color::on(supports_color::Stream::Stderr).is_some()
-            } else if #[cfg(all(feature = "fancy", feature = "fancy-no-backtrace"))] {
-                // Fancy mode without backtrace but with color support
-                supports_color::on(supports_color::Stream::Stderr).is_some()
-            } else if #[cfg(not(feature = "std"))] {
-                // No-std environment - no color support by default
-                false
-            } else {
-                // All other cases - no color support
-                false
-            }
+        #[cfg(feature = "fancy-no-backtrace")]
+        {
+            supports_color::on(supports_color::Stream::Stderr).is_some()
+        }
+        #[cfg(not(feature = "fancy-no-backtrace"))]
+        {
+            false
         }
     }
 
     #[inline]
     pub(super) fn supports_color_has_16m() -> Option<bool> {
-        cfg_if! {
-            if #[cfg(feature = "fancy-no-backtrace")] {
-                supports_color::on(supports_color::Stream::Stderr).map(|color| color.has_16m)
-            } else if #[cfg(feature = "fancy-no-syscall")] {
-                // In no-std environment without color support, default to no RGB color support
-                Some(false)
-            } else {
-                Some(true) // Fallback to assuming RGB support
-            }
+        #[cfg(feature = "fancy-no-backtrace")]
+        {
+            supports_color::on(supports_color::Stream::Stderr).map(|color| color.has_16m)
+        }
+        #[cfg(not(feature = "fancy-no-backtrace"))]
+        {
+            None
         }
     }
 
     #[inline]
     pub(super) fn supports_unicode() -> bool {
-        cfg_if! {
-            if #[cfg(feature = "fancy-no-syscall")] {
-                false
-            } else if #[cfg(feature = "fancy-no-backtrace")] {
-                supports_unicode::on(supports_unicode::Stream::Stderr)
-            } else {
-                false
-            }
+        #[cfg(feature = "fancy-no-backtrace")]
+        {
+            supports_unicode::on(supports_unicode::Stream::Stderr)
+        }
+        #[cfg(not(feature = "fancy-no-backtrace"))]
+        {
+            false
         }
     }
 }
