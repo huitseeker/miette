@@ -1,7 +1,7 @@
 #![no_std]
 #![deny(missing_docs, missing_debug_implementations, nonstandard_style)]
 #![warn(unreachable_pub, rust_2018_idioms)]
-#![warn(
+#![deny(
     clippy::alloc_instead_of_core,
     clippy::std_instead_of_core,
     clippy::std_instead_of_alloc

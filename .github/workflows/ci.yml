@@ -99,6 +99,20 @@ jobs:
           MIRIFLAGS: -Zmiri-disable-isolation -Zmiri-strict-provenance
         run: cargo miri test --all --verbose --features fancy
 
+  feature-check:
+    name: Feature combinations check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Install cargo-hack
+        uses: taiki-e/install-action@cargo-hack
+      - name: Check feature powerset
+        run: cargo hack check --feature-powerset --no-dev-deps --skip default
+
   minimal_versions:
     name: Minimal versions check
     runs-on: ${{ matrix.os }}

@@ -352,10 +352,6 @@ impl MietteHandlerOpts {
         } else if let Some(force_graphical) = self.force_graphical {
             force_graphical
         } else {
-            #[cfg(all(feature = "fancy-no-syscall", not(feature = "fancy-no-backtrace")))]
-            {
-                true
-            }
             #[cfg(feature = "fancy-no-backtrace")]
             {
                 if let Ok(env) = std::env::var("NO_GRAPHICS") {
@@ -363,6 +359,11 @@ impl MietteHandlerOpts {
                 } else {
                     true
                 }
+            }
+            #[cfg(not(feature = "fancy-no-backtrace"))]
+            {
+                // fancy-base or fancy-no-syscall without std: default to graphical
+                true
             }
         }
     }

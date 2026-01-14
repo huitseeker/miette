@@ -731,15 +731,6 @@ impl SourceOffset {
                 .map(|txt| Self::from_location(txt, loc.line() as usize, loc.column() as usize))?,
         ))
     }
-
-    /// Returns both the filename that was given and the offset of the caller
-    /// as a [`SourceOffset`].
-    ///
-    /// In no_std environments, this is not supported and will return an error.
-    #[cfg(not(feature = "std"))]
-    pub fn from_current_location() -> Result<(String, Self), MietteError> {
-        Err(MietteError::OutOfBounds)
-    }
 }
 
 impl From<ByteOffset> for SourceOffset {
